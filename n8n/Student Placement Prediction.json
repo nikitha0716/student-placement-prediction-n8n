@@ -1,0 +1,176 @@
+{
+  "name": "Student Placement Prediction",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Student Placement Prediction",
+        "formDescription": "Enter the student details to predict placement using the Random Forest model.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "SSC Percentage (ssc_p)",
+              "fieldType": "number",
+              "fieldName": "ssc_p",
+              "placeholder": "e.g. 75.5",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "HSC Percentage (hsc_p)",
+              "fieldType": "number",
+              "fieldName": "hsc_p",
+              "placeholder": "e.g. 75.5",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Degree Percentage (degree_p)",
+              "fieldType": "number",
+              "fieldName": "degree_p",
+              "placeholder": "e.g. 75.5",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Work Experience (workex)",
+              "fieldType": "dropdown",
+              "fieldName": "workex",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Employability Test Percentage (etest_p)",
+              "fieldType": "number",
+              "fieldName": "etest_p",
+              "placeholder": "e.g. 75.5",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "MBA Specialisation (specialisation)",
+              "fieldType": "dropdown",
+              "fieldName": "specialisation",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Mkt&Fin"
+                  },
+                  {
+                    "option": "Mkt&HR"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "MBA Percentage (mba_p)",
+              "fieldType": "number",
+              "fieldName": "mba_p",
+              "placeholder": "e.g. 75.5",
+              "requiredField": true
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "buttonLabel": "Predict Placement"
+        }
+      },
+      "id": "697882c2-ef9c-427b-b499-ba6dc1dfba8f",
+      "name": "Student Details Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "ca49f92f-05d6-4b69-a19b-f124ec780c52"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://squatted-nutshell-condition.ngrok-free.dev/predict",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "ngrok-skip-browser-warning",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ssc_p\": {{$json.ssc_p}},\n  \"hsc_p\": {{$json.hsc_p}},\n  \"degree_p\": {{$json.degree_p}},\n  \"workex\": \"{{$json.workex}}\",\n  \"etest_p\": {{$json.etest_p}},\n  \"specialisation\": \"{{$json.specialisation}}\",\n  \"mba_p\": {{$json.mba_p}}\n}",
+        "options": {}
+      },
+      "id": "4ff5f586-6361-43e9-85ee-9fcdb39af35f",
+      "name": "Random Forest Predict API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "=Prediction: {{ $json.prediction }}",
+        "completionMessage": "=Placed probability: {{ Number($json.placed_probability) <= 1 ? (Number($json.placed_probability) * 100).toFixed(2) : Number($json.placed_probability).toFixed(2) }}%\nNot placed probability: {{ Number($json.not_placed_probability) <= 1 ? (Number($json.not_placed_probability) * 100).toFixed(2) : Number($json.not_placed_probability).toFixed(2) }}%\nRisk level: {{ $json.risk_level }}",
+        "options": {}
+      },
+      "id": "edd0470f-7ad0-4a57-bff4-0757cb55aed1",
+      "name": "Show Prediction Result",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        448,
+        0
+      ],
+      "webhookId": "4f15a885-92c4-4c59-9689-7a137d718217"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Student Details Form": {
+      "main": [
+        [
+          {
+            "node": "Random Forest Predict API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Random Forest Predict API": {
+      "main": [
+        [
+          {
+            "node": "Show Prediction Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "71a2505c-21dd-41f4-ba3a-156aa3b9cc6c",
+  "meta": {
+    "instanceId": "74de05ee40233d97ff56d6d7bdfcac844c14087c9e11b77fe291f09908caa60a"
+  },
+  "nodeGroups": [],
+  "id": "xbJx2SAD32rXR2Gj",
+  "tags": []
+}
